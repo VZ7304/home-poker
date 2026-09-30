@@ -71,6 +71,7 @@
       body.playing #game .seat-name-game{font-size:clamp(8px,1.25vw,10px)}
       body.playing #game .seat-role{min-height:9px;font-size:7px}
       body.playing #game .seat-tag{font-size:7px}
+      body.playing #game .seat.current .seat-tag{display:none!important}
       body.playing #game .dealer-chip{width:14px;height:14px;font-size:7px}
       body.playing #game .seat-clock{display:none!important}
       body.playing.seat-clock-on #game .seat.current .seat-clock{display:block!important;margin:3px 0 2px;font-size:clamp(17px,4.5vh,24px);line-height:1}
@@ -80,13 +81,14 @@
       body.playing #game .center-countdown .timer-num{font-size:clamp(56px,19vh,82px);font-weight:900}
       body.playing #game .center-countdown .timer-unit{font-size:9px;margin-top:3px}
       body.playing #game .center-countdown .timer-paused{font-size:8px;min-height:10px}
+      body.playing #game .center-countdown .timer{pointer-events:auto;cursor:pointer;touch-action:manipulation}
       body.playing #game .center-current{max-width:min(42vw,280px);font-size:clamp(12px,2vw,15px);text-align:center}
       body.playing #game .side-stack{position:absolute;z-index:5;inset:0;display:block;overflow:visible;pointer-events:none}
       body.playing #game .side-stack .info-card,body.playing #game #endHandBtn{display:none!important}
       body.playing #game .turn-card{position:absolute;inset:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;pointer-events:none}
       body.playing #game .turn-eyebrow,body.playing #game .current-name,body.playing #game .turn-seat,body.playing #game .turn-card>.timer{display:none}
-      body.playing #game .turn-buttons{position:absolute;top:50%;right:max(7px,env(safe-area-inset-right,0px));left:auto;width:clamp(48px,7vw,60px);margin:0;display:grid;grid-template-columns:1fr;gap:7px;transform:translateY(-50%);pointer-events:auto}
-      body.playing #game .turn-buttons button{min-width:0;min-height:38px;padding:5px 2px;border-radius:10px;font-size:clamp(8px,1.05vw,10px);line-height:1.1;white-space:normal;box-shadow:0 3px 9px #0007}
+      body.playing #game .turn-buttons{position:absolute;top:auto;right:max(8px,env(safe-area-inset-right,0px));bottom:max(9px,env(safe-area-inset-bottom,0px));left:56%;width:auto;margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;transform:none;pointer-events:auto}
+      body.playing #game .turn-buttons button{min-width:0;min-height:44px;padding:7px 5px;border-radius:10px;font-size:clamp(10px,1.4vw,12px);line-height:1.1;white-space:normal;box-shadow:0 3px 9px #0007}
       body.playing #game .winner-banner{position:absolute;top:auto;bottom:max(9px,env(safe-area-inset-bottom,0px));left:50%;width:min(300px,48vw);margin:0;padding:5px;transform:translateX(-50%);pointer-events:auto}
       body.playing #game .small-note,body.playing #game .history{display:none!important}
     }
@@ -94,7 +96,7 @@
       body.playing.virtual-landscape #game{inset:auto;top:0;left:100vw;right:auto;bottom:auto;width:100dvh;height:100dvw;padding:0!important;transform:rotate(90deg);transform-origin:top left}
       body.playing.virtual-landscape #game .game-grid{height:100dvw}
       body.playing.virtual-landscape #game .game-top{top:max(5px,env(safe-area-inset-right,0px));left:max(9px,env(safe-area-inset-top,0px));right:max(9px,env(safe-area-inset-bottom,0px))}
-      body.playing.virtual-landscape #game .turn-buttons{right:max(7px,env(safe-area-inset-bottom,0px))}
+      body.playing.virtual-landscape #game .turn-buttons{top:auto;right:max(8px,env(safe-area-inset-bottom,0px));bottom:max(9px,env(safe-area-inset-left,0px));left:56%;width:auto;transform:none}
       body.playing.virtual-landscape #game .winner-banner{bottom:max(9px,env(safe-area-inset-left,0px))}
     }
   </style>
@@ -177,7 +179,7 @@
             <div class="felt">
               <div class="table-logo" id="tableLogo"><span>♠</span>HOME POKER</div>
               <div class="table-status" id="tableStatus">Ván <strong>1</strong><br>Chờ người chơi hành động</div>
-              <div class="center-countdown hidden" id="centerCountdown"><div class="timer" id="timerRing"><div class="timer-content"><div class="timer-num" id="timerNum">30</div><div class="timer-unit">GIÂY</div><div class="timer-paused" id="timerPaused"></div></div></div><div class="center-current" id="centerCurrent"></div></div>
+              <div class="center-countdown hidden" id="centerCountdown"><div class="timer" id="timerRing" role="button" tabindex="0" aria-label="Tạm dừng đồng hồ" aria-pressed="false" title="Chạm để tạm dừng hoặc tiếp tục"><div class="timer-content"><div class="timer-num" id="timerNum">30</div><div class="timer-unit">GIÂY</div><div class="timer-paused" id="timerPaused"></div></div></div><div class="center-current" id="centerCurrent"></div></div>
             </div>
             <div id="seats"></div>
           </div>
@@ -251,19 +253,24 @@
       const blindSeat=game.sbSeat, bigSeat=game.bbSeat;
       const seats=$('seats');seats.innerHTML='';
       const landscapePhone=document.body.classList.contains('virtual-landscape')||window.matchMedia('(orientation:landscape) and (max-height:520px)').matches;
-      game.players.forEach((name,i)=>{const angle=(-90+i*360/n)*Math.PI/180, x=50+(landscapePhone?37:40)*Math.cos(angle),y=50+(landscapePhone?35:39)*Math.sin(angle);const node=document.createElement('div');node.className='seat'+(i===game.active&&!game.done?' current':'')+(game.folded.has(i)?' folded':'');node.style.left=x+'%';node.style.top=y+'%';let roleText=i===game.buttonSeat&&i===blindSeat?'DEALER · SMALL BLIND':i===game.buttonSeat?'DEALER':i===blindSeat?'SMALL BLIND':i===bigSeat?'BIG BLIND':'';const clockText=game.paused?'Ⅱ '+Math.max(0,game.remaining):Math.max(0,game.remaining);node.innerHTML=`<div class="seat-card">${i===game.buttonSeat?'<span class="dealer-chip">D</span>':''}<div class="seat-name-game">${escapeAttr(name)}</div>${i===game.active&&!game.done?`<div class="seat-clock">${clockText}</div>`:''}<div class="seat-role">${roleText}</div><div class="seat-tag">${game.folded.has(i)?'ĐÃ ÚP BÀI':game.paused&&i===game.active?'TẠM DỪNG':i===game.active&&!game.done?'ĐANG HÀNH ĐỘNG':`GHẾ ${i+1}`}</div></div>`;seats.append(node)});
+      game.players.forEach((name,i)=>{const angle=(-90+i*360/n)*Math.PI/180, x=50+(landscapePhone?37:40)*Math.cos(angle),y=50+(landscapePhone?35:39)*Math.sin(angle);const node=document.createElement('div');node.className='seat'+(i===game.active&&!game.done?' current':'')+(game.folded.has(i)?' folded':'');node.style.left=x+'%';node.style.top=y+'%';let roleText=i===game.buttonSeat&&i===blindSeat?'DEALER · SMALL BLIND':i===game.buttonSeat?'DEALER':i===blindSeat?'SMALL BLIND':i===bigSeat?'BIG BLIND':'';const clockText=game.paused?'Ⅱ '+Math.max(0,game.remaining):Math.max(0,game.remaining);node.innerHTML=`<div class="seat-card">${i===game.buttonSeat?'<span class="dealer-chip">D</span>':''}<div class="seat-name-game">${escapeAttr(name)}</div>${i===game.active&&!game.done?`<div class="seat-clock" role="button" tabindex="0" aria-label="Tạm dừng đồng hồ" aria-pressed="${String(game.paused)}">${clockText}</div>`:''}<div class="seat-role">${roleText}</div><div class="seat-tag">${game.folded.has(i)?'ĐÃ ÚP BÀI':game.paused&&i===game.active?'TẠM DỪNG':i===game.active&&!game.done?'ĐANG HÀNH ĐỘNG':`GHẾ ${i+1}`}</div></div>`;seats.append(node)});
       const activeName=game.players[game.active]||'—';$('currentName').textContent=game.done?'Ván đã kết thúc':activeName;$('currentSeat').textContent=game.done?`Sẵn sàng cho ván ${game.hand+1}`:`Ghế ${game.active+1} · Lượt ${game.turn}`;$('turnHint').textContent=game.waitingForLandscape?'Xoay ngang iPhone để đồng hồ bắt đầu.':game.paused?'Đồng hồ đang tạm dừng.':'Hết giờ sẽ tự chuyển sang ghế kế tiếp.';$('turnLabel').textContent=game.done?'VÁN HIỆN TẠI ĐÃ XONG':'ĐANG ĐẾN LƯỢT';$('tableStatus').innerHTML=game.done?`Ván <strong>${game.hand}</strong><br>Nhấn “Kết thúc ván” để chia ván mới`:`Ván <strong>${game.hand}</strong><br>Chờ <strong>${escapeAttr(activeName)}</strong> hành động`;$('centerCurrent').textContent=game.done?'Ván đã kết thúc':activeName;syncClockMode();
       updateTimerDisplay();$('winnerBanner').style.display=game.folded.size>=n-1?'block':'none';if(game.folded.size>=n-1){const winner=game.players.find((_,i)=>!game.folded.has(i));$('winnerBanner').textContent=`🏆 ${winner} là người chơi cuối cùng còn lại.`} $('nextBtn').disabled=game.done||game.folded.size>=n-1;$('foldBtn').disabled=game.done||game.folded.size>=n-1;$('bankBtn').disabled=game.done||game.folded.size>=n-1;$('endHandBtn').textContent=`Kết thúc ván ${game.hand} · Sang ván mới`;
       const sched=$('scheduleView');sched.innerHTML='';game.levels.forEach((l,i)=>{const row=document.createElement('div');row.className='schedule-item'+(i===game.level?' active':'');row.innerHTML=`<span>Mức ${i+1} <em>· ${i===game.level?Math.max(0,l.hands-game.completedInLevel):l.hands} ván</em></span><strong>${money(l.sb)} / ${money(l.bb)}</strong>`;sched.append(row)});
       const hist=$('history');hist.innerHTML=game.history.length?game.history.map(h=>`<div class="history-row"><span>${escapeAttr(h.text)}</span><time>${h.time}</time></div>`).join(''):'<div style="color:#7f8c82;font-size:10px">Chưa có hành động nào.</div>';
     }
-    function updateTimerDisplay(){const total=game.turnSeconds,remaining=game.remaining,shown=Math.max(0,remaining);$('timerNum').textContent=shown;$('timerRing').style.setProperty('--progress',`${Math.min(100,Math.max(0,remaining/total*100))}%`);$('timerRing').classList.toggle('warning',remaining<=10&&remaining>0);$('timerRing').classList.toggle('expired',remaining<=0);$('timerPaused').textContent=game.paused?'TẠM DỪNG':'';$('timerNum').style.color=remaining<=5?'var(--red)':'';$('centerCurrent').textContent=game.done?'Ván đã kết thúc':game.players[game.active]||'';document.querySelectorAll('.seat-clock').forEach(el=>el.textContent=(game.paused?'Ⅱ ':'')+shown);}
+    function updateTimerDisplay(){const total=game.turnSeconds,remaining=game.remaining,shown=Math.max(0,remaining);$('timerNum').textContent=shown;$('timerRing').style.setProperty('--progress',`${Math.min(100,Math.max(0,remaining/total*100))}%`);$('timerRing').classList.toggle('warning',remaining<=10&&remaining>0);$('timerRing').classList.toggle('expired',remaining<=0);$('timerPaused').textContent=game.paused?'TẠM DỪNG':'';$('timerRing').setAttribute('aria-label',game.paused?'Tiếp tục đồng hồ':'Tạm dừng đồng hồ');$('timerRing').setAttribute('aria-pressed',String(game.paused));$('timerNum').style.color=remaining<=5?'var(--red)':'';$('centerCurrent').textContent=game.done?'Ván đã kết thúc':game.players[game.active]||'';document.querySelectorAll('.seat-clock').forEach(el=>{el.textContent=(game.paused?'Ⅱ ':'')+shown;el.setAttribute('aria-label',game.paused?'Tiếp tục đồng hồ':'Tạm dừng đồng hồ');el.setAttribute('aria-pressed',String(game.paused))});}
+    function toggleTimerPause(){if(!game||game.done||game.waitingForLandscape)return;game.paused=!game.paused;$('pauseBtn').textContent=game.paused?'▶ Tiếp tục':'Ⅱ Tạm dừng';updateTimerDisplay()}
     function startClock(){clearInterval(timerHandle);timerHandle=setInterval(()=>{if(!game||game.paused||game.done)return;if(game.remaining>0){game.remaining--;playTimerSound(game.remaining);updateTimerDisplay();if(game.remaining===0){addHistory(`Hết giờ · ${game.players[game.active]}`);advance(false)}}},1000)}
     function advance(log=true){if(!game||game.done)return;const n=game.players.length,old=game.active;if(log)addHistory(`${game.players[old]} · Sang lượt`);let next=old;for(let i=0;i<n;i++){next=(next+1)%n;if(!game.folded.has(next))break}game.active=next;game.turn++;game.remaining=game.turnSeconds;renderGame()}
     $('nextBtn').addEventListener('click',()=>advance(true));
     $('foldBtn').addEventListener('click',()=>{if(!game||game.done)return;game.folded.add(game.active);addHistory(`${game.players[game.active]} · Úp bài`);if(game.folded.size>=game.players.length-1){game.done=true;clearInterval(timerHandle);game.remaining=0;renderGame()}else advance(false)});
     $('bankBtn').addEventListener('click',()=>{if(!game||game.done)return;game.remaining+=game.bankSeconds;addHistory(`${game.players[game.active]} · Time bank +${game.bankSeconds}s`);updateTimerDisplay();renderGame()});
-    $('pauseBtn').addEventListener('click',()=>{if(!game||game.waitingForLandscape)return;game.paused=!game.paused;$('pauseBtn').textContent=game.paused?'▶ Tiếp tục':'Ⅱ Tạm dừng';updateTimerDisplay()});
+    $('pauseBtn').addEventListener('click',toggleTimerPause);
+    $('timerRing').addEventListener('click',toggleTimerPause);
+    $('timerRing').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleTimerPause()}});
+    $('seats').addEventListener('click',e=>{if(e.target.closest('.seat-clock'))toggleTimerPause()});
+    $('seats').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest('.seat-clock')){e.preventDefault();toggleTimerPause()}});
     $('centerClockToggle').addEventListener('click',()=>{seatClockMode=!seatClockMode;syncClockMode()});
     $('soundToggleBtn').addEventListener('click',()=>{soundEnabled=!soundEnabled;if(soundEnabled)activateAudio();syncClockMode()});
     $('endHandBtn').addEventListener('click',()=>{if(!game)return;const n=game.players.length;addHistory(`Kết thúc ván ${game.hand}`);game.completedInLevel++;if(game.completedInLevel>=game.levels[game.level].hands&&game.level<game.levels.length-1){game.level++;game.completedInLevel=0;addHistory(`Blind tăng · ${blindsFor(game.level)}`)}game.hand++;game.buttonSeat=(game.buttonSeat+1)%n;game.sbSeat=(game.sbSeat+1)%n;game.bbSeat=(game.bbSeat+1)%n;game.firstSeat=(game.firstSeat+1)%n;game.active=game.firstSeat;game.turn=1;game.folded=new Set();game.done=false;game.paused=false;game.waitingForLandscape=false;game.remaining=game.turnSeconds;$('pauseBtn').disabled=false;$('pauseBtn').textContent='Ⅱ Tạm dừng';renderGame();startClock()});
