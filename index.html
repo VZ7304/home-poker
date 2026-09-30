@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#101714">
   <title>Home Poker — Bàn chơi tại nhà</title>
   <style>
@@ -41,6 +41,52 @@
       .table-logo{top:34%}.table-logo span{font-size:18px}.table-status{top:49%}.center-countdown{top:39%}.center-countdown .timer{width:112px;height:112px;margin:0}.center-countdown .timer:before{inset:6px}.center-countdown .timer-num{font-size:40px}.center-countdown .timer-unit{font-size:8px}.center-current{font-size:9px}.center-toggle{top:66%;font-size:9px;padding:4px 9px}.seat-clock{font-size:25px}.seat.current .seat-card{min-width:84px}
     }
     @media (orientation:landscape) and (max-height:400px){.center-countdown{top:38%}.center-countdown .timer{width:90px;height:90px}.center-countdown .timer-num{font-size:34px}.center-toggle{top:65%}.seat-clock{font-size:22px}.turn-buttons{margin-top:5px}.turn-buttons button{padding:6px 2px;font-size:8px}}
+  </style>
+  <style>
+    /* Immersive playing table for an iPhone held in landscape. */
+    .mini-toolbar-btn{display:none}
+    @media (orientation:landscape) and (max-height:520px) {
+      body.playing{height:100dvh;min-height:100dvh;overflow:hidden;background:#0c130f}
+      body.playing .shell{width:100%;height:100dvh;min-height:0;margin:0;padding:0}
+      body.playing .topbar{display:none}
+      body.playing #game{position:fixed;inset:0;z-index:20;display:block!important;overflow:hidden;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);background:radial-gradient(ellipse at 50% 45%,#182a20 0,#0b120e 78%)}
+      body.playing #game .game-top{position:absolute;z-index:8;top:max(5px,env(safe-area-inset-top,0px));left:max(9px,env(safe-area-inset-left,0px));right:max(9px,env(safe-area-inset-right,0px));height:31px;min-height:0;margin:0;pointer-events:none}
+      body.playing #game .game-title{pointer-events:none}
+      body.playing #game .game-title h1,body.playing #game .game-title p{display:none}
+      body.playing #game .game-title .eyebrow{font-size:9px;letter-spacing:.1em;text-shadow:0 1px 5px #000}
+      body.playing #game .top-actions{pointer-events:auto;display:flex;flex-direction:row;gap:5px}
+      body.playing #game .top-actions button{min-height:28px;padding:4px 8px;border-radius:9px;font-size:9px;line-height:1;white-space:nowrap;box-shadow:0 2px 7px #0005}
+      body.playing #game .mini-toolbar-btn{display:inline-flex;align-items:center;justify-content:center}
+      body.playing #game .game-grid{position:absolute;inset:0;display:block;width:100%;height:100dvh;min-height:0;margin:0}
+      body.playing #game .table-card{position:absolute;z-index:1;inset:0;width:100%;height:100%;min-height:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden}
+      body.playing #game .felt-wrap{position:absolute;inset:0;width:100%;height:100%;max-width:none;min-height:0;margin:0;aspect-ratio:auto}
+      body.playing #game .felt{left:4%;top:8%;width:92%;height:84%;border-width:7px;box-shadow:inset 0 0 0 2px #76a88033,inset 0 18px 40px #ffffff08,0 9px 24px #0008}
+      body.playing #game .felt:after{inset:5px}
+      body.playing #game .table-logo,body.playing #game .table-status,body.playing #game .center-toggle,body.playing #game .table-foot{display:none!important}
+      body.playing #game .seat{width:clamp(58px,9vw,82px);gap:2px}
+      body.playing #game .seat-card{width:100%;padding:4px 3px 3px;border-radius:8px;background:#17231dcc;box-shadow:0 3px 10px #0008}
+      body.playing #game .seat.current .seat-card{min-width:0;border-color:var(--gold);background:#354331ed;box-shadow:0 0 0 2px #edc77633,0 4px 12px #0009}
+      body.playing #game .seat-name-game{font-size:clamp(8px,1.25vw,10px)}
+      body.playing #game .seat-role{min-height:9px;font-size:7px}
+      body.playing #game .seat-tag{font-size:7px}
+      body.playing #game .dealer-chip{width:14px;height:14px;font-size:7px}
+      body.playing #game .seat-clock{display:none!important}
+      body.playing #game .center-countdown,body.playing #game .center-countdown.hidden{display:flex!important;top:45%;left:50%;gap:5px;flex-direction:column-reverse;transform:translate(-50%,-50%)}
+      body.playing #game .center-countdown .timer{width:clamp(118px,31vw,148px);height:clamp(118px,31vw,148px);margin:0}
+      body.playing #game .center-countdown .timer:before{inset:7px;background:#10271a;border-color:#abd8b477}
+      body.playing #game .center-countdown .timer-num{font-size:clamp(49px,12vw,64px);font-weight:900}
+      body.playing #game .center-countdown .timer-unit{font-size:9px;margin-top:3px}
+      body.playing #game .center-countdown .timer-paused{font-size:8px;min-height:10px}
+      body.playing #game .center-current{max-width:min(42vw,280px);font-size:clamp(12px,2vw,15px);text-align:center}
+      body.playing #game .side-stack{position:absolute;z-index:5;inset:0;display:block;overflow:visible;pointer-events:none}
+      body.playing #game .side-stack .info-card,body.playing #game #endHandBtn{display:none!important}
+      body.playing #game .turn-card{position:absolute;inset:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;pointer-events:none}
+      body.playing #game .turn-eyebrow,body.playing #game .current-name,body.playing #game .turn-seat,body.playing #game .turn-card>.timer{display:none}
+      body.playing #game .turn-buttons{position:absolute;top:70%;left:50%;width:min(390px,74vw);margin:0;display:grid;grid-template-columns:1fr 1.16fr 1fr;gap:6px;transform:translate(-50%,-50%);pointer-events:auto}
+      body.playing #game .turn-buttons button{min-width:0;min-height:36px;padding:6px 5px;border-radius:10px;font-size:clamp(9px,1.3vw,11px);box-shadow:0 3px 9px #0007}
+      body.playing #game .winner-banner{position:absolute;top:80%;left:50%;width:min(390px,76vw);margin:0;padding:5px;transform:translateX(-50%);pointer-events:auto}
+      body.playing #game .small-note,body.playing #game .history{display:none!important}
+    }
   </style>
 </head>
 <body>
@@ -102,7 +148,7 @@
     <section id="game">
       <div class="game-top">
         <div class="game-title"><div class="eyebrow">Đang chơi · <span id="gameBlindsTop">1.000 / 2.000</span></div><h1>Bàn poker</h1><p id="gameSubtitle">5 người chơi · Buy-in 500.000 ₫</p></div>
-        <div class="top-actions"><button id="pauseBtn" class="secondary">Ⅱ Tạm dừng</button><button id="resetBtn" class="secondary">⚙ Cài đặt bàn</button></div>
+        <div class="top-actions"><button id="pauseBtn" class="secondary">Ⅱ Tạm dừng</button><button id="newHandMiniBtn" class="secondary mini-toolbar-btn" type="button" aria-label="Bắt đầu ván mới">↻ Ván mới</button><button id="resetBtn" class="secondary" title="Quay về cài đặt và đặt lại bàn">↺ Reset</button></div>
       </div>
       <div class="game-grid">
         <section class="card table-card">
@@ -167,7 +213,7 @@
       const levels=levelData.map(l=>({sb:Math.max(1,+l.sb||1),bb:Math.max(1,+l.bb||2),hands:Math.max(1,+l.hands||1)}));
       const initialSb=+$('sbSeat').value,initialBb=+$('bbSeat').value;
       game={players,levels,turnSeconds:Math.max(5,+$('turnSeconds').value||30),bankSeconds:Math.max(5,+$('bankSeconds').value||30),buyin:Math.max(0,+$('buyin').value||0),sbSeat:initialSb,bbSeat:initialBb,firstSeat:+$('firstSeat').value,buttonSeat:players.length===2?initialSb:(initialSb+players.length-1)%players.length,active:+$('firstSeat').value,folded:new Set(),level:0,completedInLevel:0,hand:1,turn:1,remaining:Math.max(5,+$('turnSeconds').value||30),paused:false,done:false,history:[]};
-      centerClockMode=false;document.body.classList.remove('center-clock-on');$('setup').style.display='none';$('game').style.display='block';$('pauseBtn').textContent='Ⅱ Tạm dừng';renderGame();startClock();
+      centerClockMode=false;document.body.classList.add('playing');document.body.classList.remove('center-clock-on');$('setup').style.display='none';$('game').style.display='block';$('pauseBtn').textContent='Ⅱ Tạm dừng';renderGame();startClock();
     }
     $('startGame').addEventListener('click',start);
     function blinds(){const l=game.levels[Math.min(game.level,game.levels.length-1)];return `${money(l.sb)} / ${money(l.bb)}`}
@@ -192,9 +238,10 @@
     $('pauseBtn').addEventListener('click',()=>{if(!game)return;game.paused=!game.paused;$('pauseBtn').textContent=game.paused?'▶ Tiếp tục':'Ⅱ Tạm dừng';updateTimerDisplay()});
     $('centerClockToggle').addEventListener('click',()=>{centerClockMode=!centerClockMode;document.body.classList.toggle('center-clock-on',centerClockMode);$('centerClockToggle').textContent=centerClockMode?'◎ Hiện giờ tại ghế':'◎ Đồng hồ giữa bàn';$('centerCountdown').classList.toggle('hidden',!centerClockMode)});
     $('endHandBtn').addEventListener('click',()=>{if(!game)return;const n=game.players.length;addHistory(`Kết thúc ván ${game.hand}`);game.completedInLevel++;if(game.completedInLevel>=game.levels[game.level].hands&&game.level<game.levels.length-1){game.level++;game.completedInLevel=0;addHistory(`Blind tăng · ${blindsFor(game.level)}`)}game.hand++;game.buttonSeat=(game.buttonSeat+1)%n;game.sbSeat=(game.sbSeat+1)%n;game.bbSeat=(game.bbSeat+1)%n;game.firstSeat=(game.firstSeat+1)%n;game.active=game.firstSeat;game.turn=1;game.folded=new Set();game.done=false;game.paused=false;game.remaining=game.turnSeconds;$('pauseBtn').textContent='Ⅱ Tạm dừng';renderGame()});
+    $('newHandMiniBtn').addEventListener('click',()=> $('endHandBtn').click());
     function blindsFor(i){const l=game.levels[Math.min(i,game.levels.length-1)];return `${money(l.sb)} / ${money(l.bb)}`}
-    $('resetBtn').addEventListener('click',()=>{clearInterval(timerHandle);game=null;centerClockMode=false;document.body.classList.remove('center-clock-on');$('game').style.display='none';$('setup').style.display='block'});
-    window.addEventListener('resize',()=>{if(game)renderGame()});
+    $('resetBtn').addEventListener('click',()=>{clearInterval(timerHandle);game=null;centerClockMode=false;document.body.classList.remove('playing','center-clock-on');$('game').style.display='none';$('setup').style.display='block'});
+    window.addEventListener('resize',()=>{if(game)renderGame()});window.addEventListener('orientationchange',()=>{if(game)renderGame()});
     buildSeatInputs();drawLevels();
   </script>
 </body>
